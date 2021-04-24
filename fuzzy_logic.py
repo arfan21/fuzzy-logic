@@ -2,7 +2,6 @@ import pandas as pd
 
 URLCSV = "https://raw.githubusercontent.com/arfan21/fuzzy-logic/main/restoran.csv"
 dataRestoran = pd.read_csv(URLCSV)
-print(dataRestoran)
 
 # skala 1 - 100
 # Pelayanan Jelek (Trapesium)
@@ -33,8 +32,8 @@ batasAtasEnakMakanan = 10.0
 
 def pelayanan(x):
     hasilPelayanan = []
-    if ((x >= batasBawahJelekPelayanan) and (x <= batasAtasJelekPelayanan)):
-        hasilPelayanan.appenpelayananJelek(x)
+    if ((x >= 0) and (x <= batasAtasJelekPelayanan)):
+        hasilPelayanan.append(pelayananJelek(x))
     if ((x >= batasBawahSedangPelayanan) and (x <= batasAtasSedangPelayanan)):
         hasilPelayanan.append(pelayananSedang(x))
     if ((x >= batasBawahBagusPelayanan) and (x <= batasAtasBagusPelayanan)):
@@ -43,10 +42,10 @@ def pelayanan(x):
 
 
 def pelayananJelek(x):
-    if (x >= 0 and x <= batasBawahJelekPelayanan):
-        return 'kecil', 1.0
+    if (x >= 0.0 and x <= batasBawahJelekPelayanan):
+        return 'jelek', 1.0
     elif (x > batasBawahJelekPelayanan and x <= batasAtasJelekPelayanan):
-        return 'kecil', ((batasAtasJelekPelayanan-x)/(batasAtasJelekPelayanan-batasBawahJelekPelayanan))
+        return 'jelek', ((batasAtasJelekPelayanan-x)/(batasAtasJelekPelayanan-batasBawahJelekPelayanan))
 
 
 def pelayananSedang(x):
@@ -58,16 +57,27 @@ def pelayananSedang(x):
 
 def pelayananBagus(x):
     if (x >= batasBawahBagusPelayanan and x <= batasAtasBagusPelayanan):
-        return 'besar',  ((x-batasBawahBagusPelayanan)/(batasAtasBagusPelayanan-batasBawahBagusPelayanan))
+        return 'bagus',  ((x-batasBawahBagusPelayanan)/(batasAtasBagusPelayanan-batasBawahBagusPelayanan))
     elif (x > batasAtasBagusPelayanan):
-        return 'besar', 1.0
+        return 'bagus', 1.0
+
+
+def makanan(x):
+    hasilMakanan = []
+    if ((x >= 0.0) and (x <= batasAtasTidakEnakMakanan)):
+        hasilMakanan.append(makananTidakEnak(x))
+    if ((x >= batasBawahSedangMakanan) and (x <= batasAtasSedangMakanan)):
+        hasilMakanan.append(makananSedang(x))
+    if ((x >= batasBawahEnakMakanan) and (x <= batasAtasEnakMakanan)):
+        hasilMakanan.append(makananEnak(x))
+    return hasilMakanan
 
 
 def makananTidakEnak(x):
     if (x >= 0 and x <= batasBawahTidakEnakMakanan):
-        return 'kecil', 1.0
+        return 'tidak enak', 1.0
     elif (x > batasBawahTidakEnakMakanan and x <= batasAtasTidakEnakMakanan):
-        return 'kecil', ((batasAtasTidakEnakMakanan-x)/(batasAtasTidakEnakMakanan-batasBawahTidakEnakMakanan))
+        return 'tidak enak', ((batasAtasTidakEnakMakanan-x)/(batasAtasTidakEnakMakanan-batasBawahTidakEnakMakanan))
 
 
 def makananSedang(x):
@@ -79,6 +89,59 @@ def makananSedang(x):
 
 def makananEnak(x):
     if (x >= batasBawahEnakMakanan and x <= batasAtasEnakMakanan):
-        return 'besar',  ((x-batasBawahEnakMakanan)/(batasAtasBagusPelayanan-batasBawahEnakMakanan))
+        return 'enak',  ((x-batasBawahEnakMakanan)/(batasAtasBagusPelayanan-batasBawahEnakMakanan))
     elif (x > batasAtasEnakMakanan):
-        return 'besar', 1.0
+        return 'enak', 1.0
+
+
+def inference(pelayanan, makanan):
+    # buruk
+    if (pelayanan == 'jelek' and makanan == 'tidak enak'):
+        return 'buruk'
+    if (pelayanan == 'jelek' and makanan == 'sedang'):
+        return 'buruk'
+    if (pelayanan == 'jelek' and makanan == 'enak'):
+        return 'buruk'
+    if (pelayanan == 'sedang' and makanan == 'tidak enak'):
+        return 'buruk'
+
+    # biasa
+    if (pelayanan == 'sedang' and makanan == 'sedang'):
+        return 'biasa'
+    if (pelayanan == 'bagus' and makanan == 'tidak enak'):
+        return 'biasa'
+    if (pelayanan == 'bagus' and makanan == 'sedang'):
+        return 'biasa'
+
+    # baik
+    if (pelayanan == 'sedang' and makanan == 'enak'):
+        return 'baik'
+    if (pelayanan == 'bagus' and makanan == 'enak'):
+        return 'baik'
+
+
+def nilaiInference(Pelayanan, Makanan):
+    maksBaik = 0.0
+    maksBiasa = 0.0
+    maksBuruk = 0.0
+    for i in pelayanan(Pelayanan):
+        for j in makanan(Makanan):
+            # print(i, j)
+            if (inference(i[0], j[0]) == 'baik'):
+                if (maksBaik < min(i[1], j[1])):
+                    maksBaik = min(i[1], j[1])
+            if (inference(i[0], j[0]) == 'biasa'):
+                if (maksBiasa < min(i[1], j[1])):
+                    maksBiasa = min(i[1], j[1])
+            if (inference(i[0], j[0]) == 'buruk'):
+                if (maksBuruk < min(i[1], j[1])):
+                    maksBuruk = min(i[1], j[1])
+    return ('baik', maksBaik), ('biasa', maksBiasa), ('buruk', maksBuruk)
+
+
+for i in dataRestoran.iterrows():
+    pelayananValue = i[1].loc['pelayanan'].astype(float)
+    makananValue = i[1].loc['makanan'].astype(float)
+    arr_sugeno = nilaiInference(pelayananValue, makananValue)
+    print(arr_sugeno[2])
+    # print(arr_sugeno)
