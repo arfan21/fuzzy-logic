@@ -139,9 +139,24 @@ def nilaiInference(Pelayanan, Makanan):
     return ('baik', maksBaik), ('biasa', maksBiasa), ('buruk', maksBuruk)
 
 
+def defuzzy(x,y,z):
+    return (x*20) + (y*50) + (z*80) / (x+y+z)
+
+temp = []
 for i in dataRestoran.iterrows():
     pelayananValue = i[1].loc['pelayanan'].astype(float)
     makananValue = i[1].loc['makanan'].astype(float)
     arr_sugeno = nilaiInference(pelayananValue, makananValue)
-    print(arr_sugeno[2])
-    # print(arr_sugeno)
+    temp.append(defuzzy(arr_sugeno[0][1],arr_sugeno[1][1],arr_sugeno[2][1]))
+
+best = sorted(zip(dataRestoran.id,temp), key=lambda x:x[1], reverse=True)
+
+bestResto = []
+for i in range(10):
+    bestResto.append(best[i])
+
+df_bestResto = pd.DataFrame(bestResto,columns=['id resto','nilai'])
+idResto = df_bestResto.loc[:,'id resto']
+
+xlsFile = pd.DataFrame(idResto)
+xlsFile.to_excel('Restoran Terbaik.xlsx', index=False)
