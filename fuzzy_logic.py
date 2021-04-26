@@ -136,7 +136,7 @@ def nilaiInference(Pelayanan, Makanan):
             if (inference(i[0], j[0]) == 'buruk'):
                 if (maksBuruk < min(i[1], j[1])):
                     maksBuruk = min(i[1], j[1])
-    return ('baik', maksBaik), ('biasa', maksBiasa), ('buruk', maksBuruk)
+    return ('buruk', maksBuruk), ('biasa', maksBiasa), ('baik', maksBaik)
 
 
 def defuzzy(x,y,z):
