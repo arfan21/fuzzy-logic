@@ -10,7 +10,6 @@ batasAtasJelekPelayanan = 50.0
 # Pelayanan Sedang (Segitiga)
 batasBawahSedangPelayanan = 40.0
 batasTengahSedangPelayanan = 65.0
-batasTengahSedangPelayanan = 65.0
 batasAtasSedangPelayanan = 90.0
 # Pelayanan Bagus (Trapesium)
 batasBawahBagusPelayanan = 80.0
@@ -23,12 +22,13 @@ batasAtasTidakEnakMakanan = 5.0
 # Makanan Sedang (Segitiga)
 batasBawahSedangMakanan = 4.0
 batasTengahSedangMakanan = 6.5
-batasTengahSedangMakanan = 6.5
 batasAtasSedangMakanan = 9.0
 # Makanan Enak (Trapesium)
 batasBawahEnakMakanan = 8.0
 batasAtasEnakMakanan = 10.0
 
+
+# fuzzyfikasi pelayanan
 
 def pelayanan(x):
     hasilPelayanan = []
@@ -62,6 +62,8 @@ def pelayananBagus(x):
         return 'bagus', 1.0
 
 
+# fuzzyfikasi makanan
+
 def makanan(x):
     hasilMakanan = []
     if ((x >= 0.0) and (x <= batasAtasTidakEnakMakanan)):
@@ -94,6 +96,8 @@ def makananEnak(x):
         return 'enak', 1.0
 
 
+# aturanan inferensi
+
 def inference(pelayanan, makanan):
     # buruk
     if (pelayanan == 'jelek' and makanan == 'tidak enak'):
@@ -120,13 +124,14 @@ def inference(pelayanan, makanan):
         return 'baik'
 
 
+# mencari nilai inferensi
+
 def nilaiInference(Pelayanan, Makanan):
     maksBaik = 0.0
     maksBiasa = 0.0
     maksBuruk = 0.0
     for i in pelayanan(Pelayanan):
         for j in makanan(Makanan):
-            # print(i, j)
             if (inference(i[0], j[0]) == 'baik'):
                 if (maksBaik < min(i[1], j[1])):
                     maksBaik = min(i[1], j[1])
@@ -139,24 +144,52 @@ def nilaiInference(Pelayanan, Makanan):
     return ('buruk', maksBuruk), ('biasa', maksBiasa), ('baik', maksBaik)
 
 
-def defuzzy(x,y,z):
+# defuzzifikasi dengan metode sugeno
+
+def defuzzy(x, y, z):
     return (x*20) + (y*50) + (z*80) / (x+y+z)
 
-temp = []
-for i in dataRestoran.iterrows():
-    pelayananValue = i[1].loc['pelayanan'].astype(float)
-    makananValue = i[1].loc['makanan'].astype(float)
-    arr_sugeno = nilaiInference(pelayananValue, makananValue)
-    temp.append(defuzzy(arr_sugeno[0][1],arr_sugeno[1][1],arr_sugeno[2][1]))
 
-best = sorted(zip(dataRestoran.id,temp), key=lambda x:x[1], reverse=True)
+# fungsi untuk mencari 10 restoran terbaik
 
-bestResto = []
-for i in range(10):
-    bestResto.append(best[i])
+def findBestResto(dataDefuzzy):
+    # mengurutkan hasil defuzzyfikasi
+    best = sorted(zip(dataRestoran.id, dataDefuzzy),
+                  key=lambda x: x[1], reverse=True)
 
-df_bestResto = pd.DataFrame(bestResto,columns=['id resto','nilai'])
-idResto = df_bestResto.loc[:,'id resto']
+    # bestResto untuk menampung 10 terbaik restoran
+    bestResto = []
+    for i in range(10):
+        bestResto.append(best[i])
+    return bestResto
 
-xlsFile = pd.DataFrame(idResto)
-xlsFile.to_excel('Restoran Terbaik.xlsx', index=False)
+
+# main program
+
+def main():
+    # temp untuk menampung hasil dari defuzzyfikasi
+    temp = []
+
+    for i, row in dataRestoran.iterrows():
+        pelayananValue = row['pelayanan'].astype(float)
+        makananValue = row['makanan'].astype(float)
+        arr_sugeno = nilaiInference(pelayananValue, makananValue)
+        defuzzyResult = defuzzy(
+            arr_sugeno[0][1], arr_sugeno[1][1], arr_sugeno[2][1])
+        temp.append(defuzzyResult)
+
+    # find best resto
+    bestResto = findBestResto(temp)
+
+    # menulis hasil peringkat ke excel
+    df_bestResto = pd.DataFrame(bestResto, columns=['id resto', 'nilai'])
+
+    print(df_bestResto)
+
+    idResto = df_bestResto.loc[:, 'id resto']
+    xlsFile = pd.DataFrame(idResto)
+    xlsFile.to_excel('peringkat.xlsx', index=False)
+
+
+if __name__ == "__main__":
+    main()
