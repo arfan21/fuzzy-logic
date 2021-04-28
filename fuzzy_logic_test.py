@@ -2,7 +2,7 @@ import pandas as pd
 
 URLCSV = "https://raw.githubusercontent.com/arfan21/fuzzy-logic/main/restoran.csv"
 dataRestoran = pd.read_csv(URLCSV)
-
+print(dataRestoran)
 # skala 1 - 100
 # Pelayanan Jelek (Trapesium)
 batasBawahJelekPelayanan = 20.0
@@ -132,13 +132,13 @@ def nilaiInference(Pelayanan, Makanan):
     maksBuruk = 0.0
     fuzzyPelayanan = pelayanan(Pelayanan)
     fuzzyMakanan = makanan(Makanan)
-    print(f"fuzzyfikasi pelayanan -> {fuzzyPelayanan}")
-    print(f"fuzzyfikasi makanan -> {fuzzyMakanan}")
+    print(f"fuzzyfikasi pelayanan -> {fuzzyPelayanan}\n")
+    print(f"fuzzyfikasi makanan -> {fuzzyMakanan}\n")
     for i in fuzzyPelayanan:
         for j in fuzzyMakanan:
             hasilInference = inference(i[0], j[0])
 
-            print(f"hasil inference -> {hasilInference}")
+            print(f"hasil inference -> {hasilInference}\n")
 
             if (hasilInference == 'baik'):
                 if (maksBaik < min(i[1], j[1])):
@@ -154,7 +154,7 @@ def nilaiInference(Pelayanan, Makanan):
     return ('buruk', maksBuruk), ('biasa', maksBiasa), ('baik', maksBaik)
 
 
-# defuzzifikasi dengan metode sugeno
+# defuzzifikasi dengan metode Weighted Average
 
 def defuzzy(x, y, z):
     return (x*20) + (y*50) + (z*80) / (x+y+z)
@@ -181,19 +181,21 @@ def main():
     temp = []
 
     for i, row in dataRestoran.head(10).iterrows():
-        print(f"id -> {row['id']}")
+        print(f"=============== id -> {row['id']} ===============\n")
 
         pelayananValue = row['pelayanan'].astype(float)
         makananValue = row['makanan'].astype(float)
+        print(f"nilai pelayanan : {pelayananValue}")
+        print(f"nilai makanan : {makananValue}\n")
         arr_sugeno = nilaiInference(pelayananValue, makananValue)
 
-        print(f"nilai inference : {arr_sugeno}")
+        print(f"nilai inference : {arr_sugeno}\n")
 
         defuzzyResult = defuzzy(
             arr_sugeno[0][1], arr_sugeno[1][1], arr_sugeno[2][1])
 
-        print(f"defuzzy result : {arr_sugeno}\n")
-
+        print(f"defuzzy result : {defuzzyResult}\n")
+        print("========================================\n")
         temp.append(defuzzyResult)
 
     # find best resto

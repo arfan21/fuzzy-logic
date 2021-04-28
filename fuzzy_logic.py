@@ -144,7 +144,7 @@ def nilaiInference(Pelayanan, Makanan):
     return ('buruk', maksBuruk), ('biasa', maksBiasa), ('baik', maksBaik)
 
 
-# defuzzifikasi dengan metode sugeno
+# defuzzifikasi dengan metode Weighted Average
 
 def defuzzy(x, y, z):
     return (x*20) + (y*50) + (z*80) / (x+y+z)
