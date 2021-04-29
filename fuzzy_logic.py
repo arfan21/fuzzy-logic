@@ -127,21 +127,21 @@ def inference(pelayanan, makanan):
 # mencari nilai inferensi
 
 def nilaiInference(Pelayanan, Makanan):
-    maksBaik = 0.0
-    maksBiasa = 0.0
-    maksBuruk = 0.0
+    minBaik = 0.0
+    minBiasa = 0.0
+    minBuruk = 0.0
     for i in pelayanan(Pelayanan):
         for j in makanan(Makanan):
             if (inference(i[0], j[0]) == 'baik'):
-                if (maksBaik < min(i[1], j[1])):
-                    maksBaik = min(i[1], j[1])
+                if (minBaik < min(i[1], j[1])):
+                    minBaik = min(i[1], j[1])
             if (inference(i[0], j[0]) == 'biasa'):
-                if (maksBiasa < min(i[1], j[1])):
-                    maksBiasa = min(i[1], j[1])
+                if (minBiasa < min(i[1], j[1])):
+                    minBiasa = min(i[1], j[1])
             if (inference(i[0], j[0]) == 'buruk'):
-                if (maksBuruk < min(i[1], j[1])):
-                    maksBuruk = min(i[1], j[1])
-    return ('buruk', maksBuruk), ('biasa', maksBiasa), ('baik', maksBaik)
+                if (minBuruk < min(i[1], j[1])):
+                    minBuruk = min(i[1], j[1])
+    return ('buruk', minBuruk), ('biasa', minBiasa), ('baik', minBaik)
 
 
 # defuzzifikasi dengan metode Weighted Average

@@ -127,9 +127,9 @@ def inference(pelayanan, makanan):
 # mencari nilai inferensi
 
 def nilaiInference(Pelayanan, Makanan):
-    maksBaik = 0.0
-    maksBiasa = 0.0
-    maksBuruk = 0.0
+    minBaik = 0.0
+    minBiasa = 0.0
+    minBuruk = 0.0
     fuzzyPelayanan = pelayanan(Pelayanan)
     fuzzyMakanan = makanan(Makanan)
     print(f"fuzzyfikasi pelayanan -> {fuzzyPelayanan}\n")
@@ -141,17 +141,17 @@ def nilaiInference(Pelayanan, Makanan):
             print(f"hasil inference -> {hasilInference}\n")
 
             if (hasilInference == 'baik'):
-                if (maksBaik < min(i[1], j[1])):
-                    maksBaik = min(i[1], j[1])
+                if (minBaik < min(i[1], j[1])):
+                    minBaik = min(i[1], j[1])
             if (hasilInference == 'biasa'):
-                if (maksBiasa < min(i[1], j[1])):
-                    maksBiasa = min(i[1], j[1])
+                if (minBiasa < min(i[1], j[1])):
+                    minBiasa = min(i[1], j[1])
             if (hasilInference == 'buruk'):
-                if (maksBuruk < min(i[1], j[1])):
-                    maksBuruk = min(i[1], j[1])
+                if (minBuruk < min(i[1], j[1])):
+                    minBuruk = min(i[1], j[1])
             print(
-                f"maks buruk : {maksBuruk} -- maks biasa : {maksBiasa} -- maks baik : {maksBaik}")
-    return ('buruk', maksBuruk), ('biasa', maksBiasa), ('baik', maksBaik)
+                f"maks buruk : {minBuruk} -- maks biasa : {minBiasa} -- maks baik : {minBaik}")
+    return ('buruk', minBuruk), ('biasa', minBiasa), ('baik', minBaik)
 
 
 # defuzzifikasi dengan metode Weighted Average
