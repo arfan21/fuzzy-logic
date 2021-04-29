@@ -138,9 +138,9 @@ def nilaiInference(Pelayanan, Makanan):
         for j in fuzzyMakanan:
             hasilInference = inference(i[0], j[0])
 
-            print(f"hasil inference -> {hasilInference}\n")
-
+            print(f"hasil inference -> {hasilInference}")
             if (hasilInference == 'baik'):
+
                 if (minBaik < min(i[1], j[1])):
                     minBaik = min(i[1], j[1])
             if (hasilInference == 'biasa'):
@@ -150,7 +150,7 @@ def nilaiInference(Pelayanan, Makanan):
                 if (minBuruk < min(i[1], j[1])):
                     minBuruk = min(i[1], j[1])
             print(
-                f"maks buruk : {minBuruk} -- maks biasa : {minBiasa} -- maks baik : {minBaik}")
+                f"min buruk : {minBuruk} -- min biasa : {minBiasa} -- min baik : {minBaik}\n")
     return ('buruk', minBuruk), ('biasa', minBiasa), ('baik', minBaik)
 
 
