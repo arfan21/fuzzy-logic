@@ -91,7 +91,7 @@ def makananSedang(x):
 
 def makananEnak(x):
     if (x >= batasBawahEnakMakanan and x <= batasAtasEnakMakanan):
-        return 'enak',  ((x-batasBawahEnakMakanan)/(batasAtasBagusPelayanan-batasBawahEnakMakanan))
+        return 'enak',  ((x-batasBawahEnakMakanan)/(batasAtasEnakMakanan-batasBawahEnakMakanan))
     elif (x > batasAtasEnakMakanan):
         return 'enak', 1.0
 
